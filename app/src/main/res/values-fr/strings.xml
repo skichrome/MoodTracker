@@ -1,2 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
-<resources></resources>
+<resources>
+    <string name="app_name">Mood Tracker</string>
+    <string name="comment_alertdialog">Commentaires</string>
+    <string name="logo_add_comment">Ajoutez un commentaire</string>
+    <string name="logo_check_history">Historique de vos humeurs</string>
+    <string name="logo_smiley">smiley</string>
+    <string name="AlertDialog_positive_btn">Valider</string>
+    <string name="comment_text_view_hint">Entrez un commentaire ici</string>
+</resources>

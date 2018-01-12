@@ -1,18 +1,24 @@
 package com.skichrome.moodtracker;
 
+import android.app.Dialog;
 import android.content.DialogInterface;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.text.Layout;
+import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.TextView;
 
 import mood.possibilities.BadMood;
 import mood.possibilities.HappyMood;
 import mood.possibilities.Mood;
-import mood.possibilities.MoodReferences;
 import mood.possibilities.NormalMood;
 import mood.possibilities.VeryBadMood;
 import mood.possibilities.VeryHappyMood;
@@ -88,14 +94,69 @@ public class MainActivity extends AppCompatActivity
              * </p>
              *
              * @param v
-             *      contains the view
+             *      contain the view
              */
             @Override
             public void onClick(View v)
             {
                 //When we click the button we display an Alertdialog who ask user to enter a string and store it in the mood object
+                final AlertDialog.Builder mComment = new AlertDialog.Builder(v.getContext());
+                LayoutInflater inflater = getLayoutInflater();
 
+                mComment.setTitle(R.string.comment_alertdialog);
+                //inflate and set the alertdialog
+                mComment.setView(inflater.inflate(R.layout.alertdialog_res, null));
+                mComment.setPositiveButton(R.string.AlertDialog_positive_btn, new DialogInterface.OnClickListener()
+                {
+                    /**
+                     * <b>For AlertDialog positive button onClickListener</b>
+                     * <p>
+                     *     In this method I get back the String entered by the user and if it's null I simply cancel the alertDialog like the cancel button
+                     * </p>
+                     * @param dialog
+                     *      the DialogInterface
+                     * @param which
+                     *      not used here
+                     */
+                    @Override
+                    public void onClick(DialogInterface dialog, int which)
+                    {
+                        EditText mAlertDialogEditText = ((AlertDialog) dialog).findViewById(R.id.TextView_alertdialog);
 
+                        if (mAlertDialogEditText != null)
+                        {
+                            String mUserText = mAlertDialogEditText.getText().toString();
+                            Log.e("Value of AlertDialog", mUserText);
+                            //Update in the current object the string associated to the user commentaries
+                        }
+                        else
+                        {
+                            dialog.dismiss();
+                        }
+                    }
+                });
+
+                mComment.setNegativeButton("Cancel", new DialogInterface.OnClickListener()
+                {
+                    /**
+                     * <b>For AlertDialog negative button onClickListener</b>
+                     * <p>
+                     *     In this method I simply cancel the alertDialog when the user touch the cancel button
+                     * </p>
+                     * @param dialog
+                     *      the DialogInterface
+                     * @param which
+                     *      not used here
+                     */
+                    @Override
+                    public void onClick(DialogInterface dialog, int which)
+                    {
+                        dialog.cancel();
+                    }
+                });
+
+                mComment.create();
+                mComment.show();
             }
         });
 
@@ -124,7 +185,7 @@ public class MainActivity extends AppCompatActivity
      */
     private void setImageAndColor()
     {
-        int i = 3;
+        int i = 4;
         mMoodImage.setImageResource(mMoodList.get(i).getMoodReferences());
         mFontLayout.setBackgroundResource(mMoodList.get(i).getColorAssociated());
     }
