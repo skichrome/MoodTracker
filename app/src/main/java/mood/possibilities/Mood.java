@@ -13,35 +13,55 @@ import com.skichrome.moodtracker.MainActivity;
  * @author skichrome
  * @version 1.0
  */
-public class Mood<T>
+public class Mood
 {
 
     //FIELDS----------------------------------------------------------------------------------------
+    /**
+     * contains the comment added by user
+     */
     private String userComment;
-    private T mMoodReferences;
+    /**
+     * contains the color associated to the smiley
+     */
+    int mColorAssociated;
+    /**
+     * contains the type of mood
+     */
+    int mMoodReferences;
 
     //CONSTRUCTORS----------------------------------------------------------------------------------
-    public Mood()
+    /**
+     * <b>Add the attribute mood to the object</b>
+     */
+    Mood()
     {
-        //this.userComment = null;
-    }
-
-    public Mood(T mMoodRef)
-    {
-        this.mMoodReferences = mMoodRef;
     }
 
     //GETTERS/SETTERS-------------------------------------------------------------------------------
+    /**
+     * <b>Able to get the user comment</b>
+     *
+     * @return the user comment
+     */
     public String getUserComment()
     {
-        return userComment;
+        return this.userComment;
     }
-    public T getMoodReferences()
+    public int getMoodReferences()
     {
-        return mMoodReferences;
+        return this.mMoodReferences;
+    }
+    public int getColorAssociated()
+    {
+        return this.mColorAssociated;
     }
     //METHODS---------------------------------------------------------------------------------------
-
+    /**
+     * used mainly for debug, describe the object
+     *
+     * @return a string who contain the description
+     */
     public String toString()
     {
         return "User comment : " + this.userComment + "\n" + "Mood reference" + this.mMoodReferences;

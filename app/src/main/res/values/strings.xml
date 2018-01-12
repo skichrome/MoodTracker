@@ -1,3 +1,7 @@
 <resources>
     <string name="app_name">MoodTracker</string>
+    <string name="comment_alertdialog">Commentaries</string>
+    <string name="logo_add_comment">add a comment</string>
+    <string name="logo_check_history">Check recent moods</string>
+    <string name="logo_smiley">smiley</string>
 </resources>
