@@ -7,4 +7,5 @@
     <string name="logo_smiley">smiley</string>
     <string name="AlertDialog_positive_btn">Valider</string>
     <string name="comment_text_view_hint">Entrez un commentaire ici</string>
+    <string name="cancel_alertdialog">annuler</string>
 </resources>

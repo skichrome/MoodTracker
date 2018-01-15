@@ -6,4 +6,5 @@
     <string name="logo_smiley">smiley</string>
     <string name="AlertDialog_positive_btn">OK</string>
     <string name="comment_text_view_hint">Please type a comment here</string>
+    <string name="cancel_alertdialog">Cancel</string>
 </resources>

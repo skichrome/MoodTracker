@@ -42,16 +42,33 @@ public class Mood
     /**
      * <b>Able to get the user comment</b>
      *
-     * @return the user comment
+     * @return String, the user comment
      */
     public String getUserComment()
     {
         return this.userComment;
     }
+    /**
+     * <b>able to set a commentary to the mood.</b>
+     */
+    public void setUserComment(String mCom)
+    {
+        this.userComment = mCom;
+    }
+    /**
+     * <b>Able to get the smiley reference</b>
+     *
+     * @return integer, the reference to the smiley
+     */
     public int getMoodReferences()
     {
         return this.mMoodReferences;
     }
+    /**
+     * <b>Able to get the color reference</b>
+     *
+     * @return integer, the reference to the color
+     */
     public int getColorAssociated()
     {
         return this.mColorAssociated;
@@ -64,6 +81,6 @@ public class Mood
      */
     public String toString()
     {
-        return "User comment : " + this.userComment + "\n" + "Mood reference" + this.mMoodReferences;
+        return "User comment : " + this.userComment + "\n" + "Mood reference" + this.mMoodReferences + "Color Reference" + this.mColorAssociated;
     }
 }
