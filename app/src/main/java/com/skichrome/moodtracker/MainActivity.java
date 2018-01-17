@@ -1,6 +1,7 @@
 package com.skichrome.moodtracker;
 
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.view.GestureDetectorCompat;
 import android.support.v7.app.AlertDialog;
@@ -14,7 +15,15 @@ import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 
+import java.io.BufferedOutputStream;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.ObjectOutputStream;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.LinkedList;
 import java.util.List;
 
 import mood.possibilities.BadMood;
@@ -35,6 +44,8 @@ import mood.possibilities.VeryHappyMood;
  */
 public class MainActivity extends AppCompatActivity
 {
+    private final String LOG_TAG_INFO_LISTMOODS = "addToRecentMoods";
+
     /**
      * This ArrayList is used to store all moods possibilities, and wil be used to change the user interface
      */
@@ -42,7 +53,7 @@ public class MainActivity extends AppCompatActivity
     /**
      * <b>Contain the list of the moods of last days</b>
      */
-    private List<Mood> mRecentMood = new ArrayList<>();
+    private List<Mood> mRecentMood = new LinkedList<>();
     /**
      * used to link and update the smiley
      */
@@ -67,6 +78,10 @@ public class MainActivity extends AppCompatActivity
      * Used to display and store the current mood selected by the user
      */
     private int mCurrentMood = 3;
+    /**
+     * get the instance from Calendar, to get the current date when the user quit the app
+     */
+    Calendar myDate = Calendar.getInstance();
 
     /**
      * <b>the method called when we start the app</b>
@@ -138,8 +153,9 @@ public class MainActivity extends AppCompatActivity
                         if (mAlertDialogEditText != null)
                         {
                             String mUserText = mAlertDialogEditText.getText().toString();
-                            Log.e("Value of AlertDialog", mUserText);
                             //Update in the current object the string associated to the user commentaries
+                            mRecentMood.get(mRecentMood.size()-1).setUserComment(mUserText);
+                            Log.d("ALERT_DIALOG", mRecentMood.get(mRecentMood.size()-1).getUserComment());
                         } else
                         {
                             dialog.dismiss();
@@ -187,22 +203,140 @@ public class MainActivity extends AppCompatActivity
             public void onClick(View v)
             {
                 //launch a new activity with recent moods
+                Intent intent = new Intent(MainActivity.this, RecentMoodActivity.class);
+                startActivity(intent);
             }
         });
     }
 
     /**
-     *  <b>Used to bind the correct parameters to the layout</b>
+     * Dispatch onPause() to fragments.
+     * <p>
+     *     When the user or the system quit the app we have to save the ArrayList and the current mood index in a file to be able to display it later
+     * </p>
+     */
+    @Override
+    protected void onPause()
+    {
+        String mFileName;
+
+        ObjectOutputStream oos;
+
+        mFileName = getFilesDir().getAbsolutePath() + "/" +"SavedMoods.oms";
+        Log.i("File Directory and name", "File Directory and name" + mFileName);
+
+        try
+        {
+            oos = new ObjectOutputStream(
+                    new BufferedOutputStream(
+                       new FileOutputStream(
+                          new File(mFileName))));
+
+            if (mRecentMood.size() != 0)
+            {
+                oos.writeObject(mRecentMood);
+                oos.writeInt(mCurrentMood);
+                Log.i("FileOutputStream", "Objects succesfully writed");
+            }
+
+            oos.close();
+        }
+        catch (FileNotFoundException e1)
+        {
+            Log.e("ERR", "File not found ...");
+            e1.printStackTrace();
+        }
+        catch (IOException e)
+        {
+            Log.e("ERR", "Error when opening the file...");
+            e.printStackTrace();
+        }
+
+        super.onPause();
+    }
+
+    /**
+     *  <b>Used to bind the correct parameters to the layout and save mood</b>
      *  <p>
      *      Called at the start of the app but also when a scroll is detected to update the layout
-     *      @param i
-     *          used to set the corresponding image and color to layout
      *  </p>
+     *  <p>
+     *      In a second part we save the current mood in the LinkedList mRecentMood. First we have to get the current date (day only),
+     *      secondly we get the saved date if exist (if not we set to -1), and finally two cases are possible :
+     *      <ul>
+     *          <li>The List size is less than 7, so the historic isn't full, we can add moods to the historic</li>
+     *          <ul>
+     *              <li>The list contains elements but the date saved doesn't match with the current date : we add new mood because
+     *                  it means that we are in another day</li>
+     *              <li>The list contains elements and the dates match : we have to delete the last element and add the new mood.</li>
+     *          </ul>
+     *          <li>the List is full : we have to delete the first mood saved and add to the end of the list a new one</li>
+     *      </ul>
+     *  </p>
+     *
+     *      @param i
+     *          Integer, used to set the corresponding image and color to layout
      */
     private void setImageAndColor(int i)
     {
+        //set the background  and the emote
         mMoodImage.setImageResource(mMoodList.get(i).getMoodReferences());
         mFontLayout.setBackgroundResource(mMoodList.get(i).getColorAssociated());
+
+        //get the date of the system
+        int currentDay = myDate.get(Calendar.DAY_OF_MONTH);
+        Log.i(LOG_TAG_INFO_LISTMOODS, "current date" + currentDay);
+
+        //get the saved date, if doesn't set it contains -1
+        int savedDay;
+        if (mRecentMood.size() == 0)
+            savedDay = -1;
+        else
+            savedDay = mRecentMood.get(mRecentMood.size() - 1).getDay();
+
+        //the list isn't full
+        if (mRecentMood.size() <= 7)
+        {
+            if (savedDay != currentDay)
+            {
+                //add new mood to list
+                addToRecentMoods(i, currentDay);
+                Log.i(LOG_TAG_INFO_LISTMOODS, "List not full, add new only");
+            }
+            //if the date is the same that the saved date we delete the last object and add a new object with the new selected mood
+            else
+            {
+                mRecentMood.remove(mRecentMood.size() - 1);
+                //add new mood to list
+                addToRecentMoods(i, currentDay);
+                Log.i(LOG_TAG_INFO_LISTMOODS, "List not full, delete last and add new");
+            }
+        }
+        else
+        {
+            mRecentMood.remove(0);
+            addToRecentMoods(i, currentDay);
+            Log.i(LOG_TAG_INFO_LISTMOODS, "List full, delete first and add new");
+
+        }
+    }
+
+    /**
+     * Just add a new mood to the LinkedList mRecentMood
+     *
+     * @see MainActivity#mRecentMood
+     * @see MainActivity#setImageAndColor(int)
+     *
+     * @param i
+     *      Integer, used to get the focused mood
+     * @param mCurrentDay
+     *      Integer, contains the current day
+     */
+    private void addToRecentMoods(int i, int mCurrentDay)
+    {
+        mRecentMood.add(mMoodList.get(i));
+        mRecentMood.get(mRecentMood.size() - 1).setDay(mCurrentDay);
+        Log.i(LOG_TAG_INFO_LISTMOODS, "Successfully added to mRecentMood");
     }
 
     /**
@@ -282,7 +416,7 @@ public class MainActivity extends AppCompatActivity
     {
 
         //FIELDS
-        private static final String DEBUG_TAG = "Gesture -------->";
+        //private static final String DEBUG_TAG = "Gesture -------->";
 
         //METHODS
 
@@ -296,7 +430,7 @@ public class MainActivity extends AppCompatActivity
         @Override
         public boolean onDown(MotionEvent e)
         {
-            Log.d(DEBUG_TAG, "OnDown");
+            //Log.d(DEBUG_TAG, "OnDown");
             return super.onDown(e);
         }
 
@@ -326,11 +460,11 @@ public class MainActivity extends AppCompatActivity
             if (e1.getY() < e2.getY())
             {
                 decreaseCurrentModPosition();
-                Log.d(DEBUG_TAG, "top to bottom, scrolled down");
+                //Log.d(DEBUG_TAG, "top to bottom, scrolled down");
             } else if (e1.getY() > e2.getY())
             {
                 increaseCurrentModPosition();
-                Log.d(DEBUG_TAG, "bottom to top, scrolled up");
+                //Log.d(DEBUG_TAG, "bottom to top, scrolled up");
             }
             return super.onFling(e1, e2, velocityX, velocityY);
         }

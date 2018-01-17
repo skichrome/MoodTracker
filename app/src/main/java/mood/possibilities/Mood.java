@@ -2,6 +2,8 @@ package mood.possibilities;
 
 import com.skichrome.moodtracker.MainActivity;
 
+import java.io.Serializable;
+
 /**
  * <b>Generic class used to create a mood object</b>
  *
@@ -13,7 +15,7 @@ import com.skichrome.moodtracker.MainActivity;
  * @author skichrome
  * @version 1.0
  */
-public class Mood
+public class Mood implements Serializable
 {
 
     //FIELDS----------------------------------------------------------------------------------------
@@ -22,21 +24,19 @@ public class Mood
      */
     private String userComment;
     /**
+     * contains the day when the mood is saved
+     */
+    private int mDay;
+    /**
      * contains the color associated to the smiley
      */
-    int mColorAssociated;
+    protected int mColorAssociated;
     /**
      * contains the type of mood
      */
-    int mMoodReferences;
+    protected int mMoodReferences;
 
     //CONSTRUCTORS----------------------------------------------------------------------------------
-    /**
-     * <b>Add the attribute mood to the object</b>
-     */
-    Mood()
-    {
-    }
 
     //GETTERS/SETTERS-------------------------------------------------------------------------------
     /**
@@ -54,6 +54,24 @@ public class Mood
     public void setUserComment(String mCom)
     {
         this.userComment = mCom;
+    }
+    /**
+     * get the day saved
+     *
+     * @return an int contain the number of the day
+     */
+    public int getDay()
+    {
+        return mDay;
+    }
+    /**
+     * set the day when the mood is saved (when the user quit the app)
+     * @param day
+     *      int contains the number of the day
+     */
+    public void setDay(int day)
+    {
+        mDay = day;
     }
     /**
      * <b>Able to get the smiley reference</b>
