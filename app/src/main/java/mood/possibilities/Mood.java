@@ -35,8 +35,29 @@ public class Mood implements Serializable
      * contains the type of mood
      */
     protected int mMoodReferences;
+    /**
+     * used to set the dimension of the TextView in the adapter
+     *
+     * @see com.skichrome.moodtracker.RecentMoodAdapter
+     */
+    protected int mDimens;
 
     //CONSTRUCTORS----------------------------------------------------------------------------------
+
+    /**
+     * <b>Constructor of {@link Mood}</b>
+     *
+     * <p>
+     *     Set the default user comment, an empty String
+     * </p>
+     *
+     * @param usrCmt
+     *      String, will contains only an empty String here.
+     */
+    public Mood(String usrCmt)
+    {
+        this.userComment = usrCmt;
+    }
 
     //GETTERS/SETTERS-------------------------------------------------------------------------------
     /**
@@ -91,6 +112,16 @@ public class Mood implements Serializable
     {
         return this.mColorAssociated;
     }
+
+    /**
+     * get the id of the dimension to be setted to the TextView in {@link com.skichrome.moodtracker.RecentMoodAdapter}
+     *
+     * @return Integer, the id.
+     */
+    public int getDimens()
+    {
+        return mDimens;
+    }
     //METHODS---------------------------------------------------------------------------------------
     /**
      * used mainly for debug, describe the object
@@ -99,6 +130,6 @@ public class Mood implements Serializable
      */
     public String toString()
     {
-        return "User comment : " + this.userComment + "\n" + "Mood reference" + this.mMoodReferences + "Color Reference" + this.mColorAssociated;
+        return "User comment : " + this.userComment + "\n" + "Mood reference " + this.mMoodReferences + "Color Reference " + this.mColorAssociated;
     }
 }

@@ -8,4 +8,13 @@
     <string name="AlertDialog_positive_btn">Valider</string>
     <string name="comment_text_view_hint">Entrez un commentaire ici</string>
     <string name="cancel_alertdialog">annuler</string>
+
+    <string name="one_week_ago">Il y a une semaine</string>
+    <string name="six_day_ago">Il y a 6 jours</string>
+    <string name="five_day_ago">Il y a 5 jours</string>
+    <string name="four_day_ago">Il y a 4 jours</string>
+    <string name="three_day_ago">Il y a 3 jours</string>
+    <string name="two_day_ago">Avant-hier</string>
+    <string name="yesterday">Hier</string>
+    <string name="today">Aujourd\'hui</string>
 </resources>

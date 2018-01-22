@@ -1,5 +1,6 @@
 package com.skichrome.moodtracker;
 
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
@@ -15,16 +16,9 @@ import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 
-import java.io.BufferedOutputStream;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.LinkedList;
-import java.util.List;
 
 import mood.possibilities.BadMood;
 import mood.possibilities.HappyMood;
@@ -32,6 +26,8 @@ import mood.possibilities.Mood;
 import mood.possibilities.NormalMood;
 import mood.possibilities.VeryBadMood;
 import mood.possibilities.VeryHappyMood;
+import mood.save.ObjectInputClass;
+import mood.save.ObjectOutputClass;
 
 /**
  * <b>The first activity of the app</b>
@@ -44,16 +40,18 @@ import mood.possibilities.VeryHappyMood;
  */
 public class MainActivity extends AppCompatActivity
 {
+    /**
+     * Debug tag for the Logs
+     */
     private final String LOG_TAG_INFO_LISTMOODS = "addToRecentMoods";
-
     /**
      * This ArrayList is used to store all moods possibilities, and wil be used to change the user interface
      */
-    private List<Mood> mMoodList = new ArrayList<>();
+    private ArrayList<Mood> mMoodList = new ArrayList<>();
     /**
      * <b>Contain the list of the moods of last days</b>
      */
-    private List<Mood> mRecentMood = new LinkedList<>();
+    private LinkedList<Mood> mRecentMood = new LinkedList<>();
     /**
      * used to link and update the smiley
      */
@@ -77,14 +75,29 @@ public class MainActivity extends AppCompatActivity
     /**
      * Used to display and store the current mood selected by the user
      */
-    private int mCurrentMood = 3;
+    private int mCurrentMood;
     /**
      * get the instance from Calendar, to get the current date when the user quit the app
      */
     Calendar myDate = Calendar.getInstance();
+    /**
+     * used to pass the context to another object
+     */
+    Context mContext;
 
     /**
      * <b>the method called when we start the app</b>
+     *
+     * <p>
+     *     This method do ;
+     *     <ul>
+     *         <li>Link to the layout</li>
+     *         <li>Detect a vertical swipe</li>
+     *         <li>setup the mood possibilities and display the default or the saved mood</li>
+     *         <li>Detect a click on commentary button and create and display an AlertDialog, who save a commentary in the current mood</li>
+     *         <li>Detect a click on recent activity button and launch it</li>
+     *     </ul>
+     * </p>
      *
      * @param savedInstanceState used to save bundle
      */
@@ -133,6 +146,15 @@ public class MainActivity extends AppCompatActivity
                 mComment.setTitle(R.string.comment_alertdialog);
                 //inflate and set the alertdialog
                 mComment.setView(inflater.inflate(R.layout.alertdialog_res, null));
+
+                String temp = mRecentMood.getLast().getUserComment();
+                if (temp.equals("")) temp = "Aucun comm sauvegardé !";
+
+
+                mComment.setMessage(temp);
+
+                Log.d("AlertDialogStream", temp);
+
                 mComment.setPositiveButton(R.string.AlertDialog_positive_btn, new DialogInterface.OnClickListener()
                 {
                     /**
@@ -154,10 +176,11 @@ public class MainActivity extends AppCompatActivity
                         {
                             String mUserText = mAlertDialogEditText.getText().toString();
                             //Update in the current object the string associated to the user commentaries
-                            mRecentMood.get(mRecentMood.size()-1).setUserComment(mUserText);
-                            Log.d("ALERT_DIALOG", mRecentMood.get(mRecentMood.size()-1).getUserComment());
+                            mRecentMood.getLast().setUserComment(mUserText);
+                            Log.d("ALERT_DIALOG", mRecentMood.getLast().getUserComment());
                         } else
                         {
+                            mRecentMood.getLast().setUserComment("");
                             dialog.dismiss();
                         }
                     }
@@ -218,45 +241,42 @@ public class MainActivity extends AppCompatActivity
     @Override
     protected void onPause()
     {
-        String mFileName;
-
-        ObjectOutputStream oos;
-
-        mFileName = getFilesDir().getAbsolutePath() + "/" +"SavedMoods.oms";
-        Log.i("File Directory and name", "File Directory and name" + mFileName);
-
-        try
-        {
-            oos = new ObjectOutputStream(
-                    new BufferedOutputStream(
-                       new FileOutputStream(
-                          new File(mFileName))));
-
-            if (mRecentMood.size() != 0)
-            {
-                oos.writeObject(mRecentMood);
-                oos.writeInt(mCurrentMood);
-                Log.i("FileOutputStream", "Objects succesfully writed");
-            }
-
-            oos.close();
-        }
-        catch (FileNotFoundException e1)
-        {
-            Log.e("ERR", "File not found ...");
-            e1.printStackTrace();
-        }
-        catch (IOException e)
-        {
-            Log.e("ERR", "Error when opening the file...");
-            e.printStackTrace();
-        }
+        ObjectOutputClass ooc = new ObjectOutputClass(this);
+        ooc.saveToFile(mRecentMood, mCurrentMood);
 
         super.onPause();
     }
 
     /**
-     *  <b>Used to bind the correct parameters to the layout and save mood</b>
+     * Dispatch onResume() to fragments.  Note that for better inter-operation
+     * with older versions of the platform, at the point of this call the
+     * fragments attached to the activity are <em>not</em> resumed.  This means
+     * that in some cases the previous state may still be saved, not allowing
+     * fragment transactions that modify the state.  To correctly interact
+     * with fragments in their proper state, you should instead override
+     * {@link #onResumeFragments()}.
+     *
+     * <p>
+     *     When the user return on this activity we load the recent mood list saved (if exist)
+     *     and the current mood index.
+     *     After what the method update the layout view.
+     * </p>
+     */
+    @Override
+    protected void onResume()
+    {
+       ObjectInputClass oic = new ObjectInputClass(this);
+       oic.LoadFromFile();
+       mRecentMood.clear();
+       mRecentMood = oic.getRecentMoodList();
+       mCurrentMood = oic.getCurrentMood();
+
+       setImageAndColor(mCurrentMood);
+       super.onResume();
+    }
+
+    /**
+     *  <b>Used to bind the correct parameters to the layout and save current mood in the list</b>
      *  <p>
      *      Called at the start of the app but also when a scroll is detected to update the layout
      *  </p>
@@ -292,7 +312,7 @@ public class MainActivity extends AppCompatActivity
         if (mRecentMood.size() == 0)
             savedDay = -1;
         else
-            savedDay = mRecentMood.get(mRecentMood.size() - 1).getDay();
+            savedDay = mRecentMood.getLast().getDay();
 
         //the list isn't full
         if (mRecentMood.size() <= 7)
@@ -301,22 +321,22 @@ public class MainActivity extends AppCompatActivity
             {
                 //add new mood to list
                 addToRecentMoods(i, currentDay);
-                Log.i(LOG_TAG_INFO_LISTMOODS, "List not full, add new only");
+                Log.i(LOG_TAG_INFO_LISTMOODS, "List not full, add new only ");
             }
             //if the date is the same that the saved date we delete the last object and add a new object with the new selected mood
             else
             {
-                mRecentMood.remove(mRecentMood.size() - 1);
+                mRecentMood.removeLast();
                 //add new mood to list
                 addToRecentMoods(i, currentDay);
-                Log.i(LOG_TAG_INFO_LISTMOODS, "List not full, delete last and add new");
+                Log.i(LOG_TAG_INFO_LISTMOODS, "List not full, delete last and add new ; "+ mRecentMood.size());
             }
         }
         else
         {
-            mRecentMood.remove(0);
+            mRecentMood.removeFirst();
             addToRecentMoods(i, currentDay);
-            Log.i(LOG_TAG_INFO_LISTMOODS, "List full, delete first and add new");
+            Log.i(LOG_TAG_INFO_LISTMOODS, "List full, delete first and add new ; " + mRecentMood.size());
 
         }
     }
@@ -334,8 +354,8 @@ public class MainActivity extends AppCompatActivity
      */
     private void addToRecentMoods(int i, int mCurrentDay)
     {
-        mRecentMood.add(mMoodList.get(i));
-        mRecentMood.get(mRecentMood.size() - 1).setDay(mCurrentDay);
+        mRecentMood.addLast(mMoodList.get(i));
+        mRecentMood.getLast().setDay(mCurrentDay);
         Log.i(LOG_TAG_INFO_LISTMOODS, "Successfully added to mRecentMood");
     }
 
@@ -414,12 +434,10 @@ public class MainActivity extends AppCompatActivity
      */
     private class MyGestureListener extends GestureDetector.SimpleOnGestureListener
     {
-
-        //FIELDS
-        //private static final String DEBUG_TAG = "Gesture -------->";
-
-        //METHODS
-
+        //FIELDS------------------------------------------------------------------------------------
+        //CONSTRUCTORS------------------------------------------------------------------------------
+        //GETTERS/SETTERS---------------------------------------------------------------------------
+        //METHODS-----------------------------------------------------------------------------------
         /**
          * detect a down touch of the user (only when the user touch the screen, not then he take off his finger
          * @param e
@@ -430,7 +448,6 @@ public class MainActivity extends AppCompatActivity
         @Override
         public boolean onDown(MotionEvent e)
         {
-            //Log.d(DEBUG_TAG, "OnDown");
             return super.onDown(e);
         }
 

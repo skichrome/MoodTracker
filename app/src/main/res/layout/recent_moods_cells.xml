@@ -1,38 +1,24 @@
 <LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:orientation="horizontal">
+    android:layout_width="wrap_content"
+    android:layout_height="100dp"
+    android:orientation="horizontal"
+    android:id="@+id/LinearLayout_content_cells">
 
-    <LinearLayout
-        android:id="@+id/LinearLayout_content_cells"
-        xmlns:android="http://schemas.android.com/apk/res/android"
-        android:layout_width="400dp"
-        android:layout_height="wrap_content" >
+    <TextView
+        android:id="@+id/content_cells"
+        android:layout_width="100dp"
+        android:layout_height="wrap_content"
+        android:gravity="start"
+        android:textSize="15sp"
+        android:textStyle="bold" />
 
-        <TextView
-            android:id="@+id/content_cells"
-            android:text="text_of_Recycler-view"
-            xmlns:android="http://schemas.android.com/apk/res/android"
-            android:layout_width="0dp"
-            android:layout_height="100dp"
-            android:gravity="center"
-            android:layout_weight="1"/>
-
-        <ImageView
-            android:id="@+id/image_content_cells"
-            android:layout_width="60dp"
-            android:layout_height="match_parent"
-            android:padding="15dp"
-            android:layout_marginEnd="20dp" />
-
-    </LinearLayout>
-
-        <TextView
-        android:id="@+id/space_content_cells"
-        android:layout_height="match_parent"
-        android:layout_width="1dp"
-            android:background="@color/silver"/>
-
+    <ImageView
+        android:id="@+id/image_content_cells"
+        android:layout_width="60dp"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:padding="15dp"
+        android:contentDescription="@string/logo_smiley"/>
 
 </LinearLayout>

@@ -1,5 +1,7 @@
 package com.skichrome.moodtracker;
 
+import android.content.Context;
+import android.content.res.Resources;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.RecyclerView.ViewHolder;
 import android.view.LayoutInflater;
@@ -9,7 +11,9 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -26,16 +30,44 @@ public class RecentMoodAdapter extends RecyclerView.Adapter<RecentMoodAdapter.My
     /**
      * contain the recent moods
      */
-    private List<Mood> mRecMoods = new LinkedList<>();
+    private LinkedList<Mood> mRecMoods = new LinkedList<>();
+    /**
+     * Used to store the titles of the recent mood TextViews
+     */
+    private ArrayList<Integer> mTitleMoods = new ArrayList<>();
+    /**
+     * Used in {@link MyViewHolder#display(Mood)} to set the width of a recent mood view
+     */
+    private Resources mResources;
+    /**
+     * used to display the correct tag to the recent mood
+     */
+    private int mRecentIndex = 0;
+    /**
+     * used to display the good mood, and save it to be reused in case of the user click to the case, to display comment with toast
+     */
+    private Mood currentMood;
 
     /**
-     * <b>set the list with the recent moods in parameter</b>
+     * <b>Constructor of {@link RecentMoodAdapter}</b>
+     *
+     * <p>
+     *     set the list with the recent moods in parameter, the arraylist who contains the links to
+     *     the correct recent mood view title and the context.
+     * </p>
+     *
      * @param recentMoods
-     *      LinkedList with the recent moods if exist
+     *      LinkedList with the recent moods
+     * @param mTitle
+     *      ArrayList with the titles availables for the views
+     * @param mCt
+     *      Context
      */
-    public RecentMoodAdapter(LinkedList<Mood> recentMoods)
+    public RecentMoodAdapter(LinkedList<Mood> recentMoods, ArrayList<Integer> mTitle, Context mCt)
     {
         this.mRecMoods = recentMoods;
+        this.mTitleMoods = mTitle;
+        this.mResources = mCt.getResources();
     }
 
     /**
@@ -102,8 +134,8 @@ public class RecentMoodAdapter extends RecyclerView.Adapter<RecentMoodAdapter.My
     @Override
     public void onBindViewHolder(MyViewHolder holder, int position)
     {
-        Mood item = mRecMoods.get(position);
-        holder.display(item);
+        currentMood = mRecMoods.get(position);
+        holder.display(currentMood);
     }
 
 
@@ -113,7 +145,7 @@ public class RecentMoodAdapter extends RecyclerView.Adapter<RecentMoodAdapter.My
     public class MyViewHolder extends ViewHolder
     {
         /**
-         * Used to fill the space, display some informations to be sure that the view exist (debug)
+         * Used to fill the space, display the title of the view
          */
         private final TextView myMood;
         /**
@@ -121,13 +153,14 @@ public class RecentMoodAdapter extends RecyclerView.Adapter<RecentMoodAdapter.My
          */
         private final LinearLayout myLinearLayout;
         /**
-         * used to set a dynamic space
-         */
-        private final TextView mySpace;
-        /**
          * the field reserved to the comment icon
          */
         private final ImageView myImage;
+        /**
+         * Used as a temporary value to show a toast with the user commentary when he click on a recent mood
+         */
+        private Mood mCurrentMood;
+
 
         /**
          * <b>Constructor of MyViewHolder</b>
@@ -145,8 +178,19 @@ public class RecentMoodAdapter extends RecyclerView.Adapter<RecentMoodAdapter.My
 
             myMood = itemView.findViewById(R.id.content_cells);
             myLinearLayout = itemView.findViewById(R.id.LinearLayout_content_cells);
-            mySpace = itemView.findViewById(R.id.space_content_cells);
             myImage = itemView.findViewById(R.id.image_content_cells);
+
+            myLinearLayout.setOnClickListener(new View.OnClickListener()
+            {
+                @Override
+                public void onClick(View v)
+                {
+                    if(!(mCurrentMood.getUserComment().equals("")))
+                    {
+                        Toast.makeText(v.getContext(), mCurrentMood.getUserComment(), Toast.LENGTH_SHORT).show();
+                    }
+                }
+            });
         }
 
         /**
@@ -156,20 +200,26 @@ public class RecentMoodAdapter extends RecyclerView.Adapter<RecentMoodAdapter.My
          */
         public void display(Mood mMood)
         {
+            mCurrentMood = mMood;
+
             //display the commment icon if a comment is stored
-            if (mMood.getUserComment() != null)
+            if (mMood.getUserComment().equals(""))
             {
-                myImage.setImageResource(R.drawable.ic_comment_black_48px);
+                myImage.setImageResource(0);
             }
             //hide the icon if no comment available
             else
             {
-                myImage.setImageResource(0);
+                myImage.setImageResource(R.drawable.ic_comment_black_48px);
             }
 
             myLinearLayout.setBackgroundResource(mMood.getColorAssociated());
-            myMood.setText(mMood.getColorAssociated());
+            myMood.setText(mTitleMoods.get(mRecMoods.size() - ++mRecentIndex));
 
+
+            ViewGroup.LayoutParams lParams = myMood.getLayoutParams();
+            lParams.width =((int)(mResources.getDimension(mMood.getDimens())/(mResources.getDisplayMetrics().density)));
+            myMood.setLayoutParams(lParams);
         }
     }
 }
