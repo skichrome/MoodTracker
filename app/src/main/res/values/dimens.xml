@@ -3,4 +3,10 @@
     <dimen name="activity_horizontal_margin">16dp</dimen>
     <dimen name="activity_vertical_margin">16dp</dimen>
     <dimen name="activity_padding">5dp</dimen>
+
+    <dimen name="very_bad_mood_layoutparams">300dp</dimen>
+    <dimen name="bad_mood">450dp</dimen>
+    <dimen name="normal_mood">600dp</dimen>
+    <dimen name="high_mood">750dp</dimen>
+    <dimen name="very_high_mood">900dp</dimen>
 </resources>

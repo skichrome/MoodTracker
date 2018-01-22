@@ -6,4 +6,15 @@
     <string name="logo_smiley">smiley</string>
     <string name="AlertDialog_positive_btn">OK</string>
     <string name="comment_text_view_hint">Please type a comment here</string>
+    <string name="cancel_alertdialog">Cancel</string>
+
+    <string name="one_week_ago">One week ago</string>
+    <string name="six_day_ago">Six days ago</string>
+    <string name="five_day_ago">Five days ago</string>
+    <string name="four_day_ago">Four days ago</string>
+    <string name="three_day_ago">thee days ago</string>
+    <string name="two_day_ago">Two days ago</string>
+    <string name="yesterday">Yesterday</string>
+    <string name="today">Today</string>
+
 </resources>
