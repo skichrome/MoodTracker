@@ -16,16 +16,11 @@ import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 
-import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.LinkedList;
 
-import mood.possibilities.BadMood;
-import mood.possibilities.HappyMood;
+import mood.functionnality.MoodsFunctionality;
 import mood.possibilities.Mood;
-import mood.possibilities.NormalMood;
-import mood.possibilities.VeryBadMood;
-import mood.possibilities.VeryHappyMood;
 import mood.save.ObjectInputClass;
 import mood.save.ObjectOutputClass;
 
@@ -44,10 +39,6 @@ public class MainActivity extends AppCompatActivity
      * Debug tag for the Logs
      */
     private final String LOG_TAG_INFO_LISTMOODS = "addToRecentMoods";
-    /**
-     * This ArrayList is used to store all moods possibilities, and wil be used to change the user interface
-     */
-    private ArrayList<Mood> mMoodList = new ArrayList<>();
     /**
      * <b>Contain the list of the moods of last days</b>
      */
@@ -84,6 +75,10 @@ public class MainActivity extends AppCompatActivity
      * used to pass the context to another object
      */
     Context mContext;
+    /**
+     * contains the list of available moods and functionality available for different moods
+     */
+    private MoodsFunctionality mMoodsFunc;
 
     /**
      * <b>the method called when we start the app</b>
@@ -117,12 +112,7 @@ public class MainActivity extends AppCompatActivity
 
         //create the Gesture detector
         mGestureDetector = new GestureDetectorCompat(this, new MyGestureListener());
-
-        //create the list of objects
-        setMoodList();
-
-        //set the image and the color for the first time, debug for the start of the project, not definitive
-        setImageAndColor(mCurrentMood);
+        mMoodsFunc = new MoodsFunctionality(this);
 
         mBtnComment.setOnClickListener(new View.OnClickListener()
         {
@@ -300,8 +290,9 @@ public class MainActivity extends AppCompatActivity
     private void setImageAndColor(int i)
     {
         //set the background  and the emote
-        mMoodImage.setImageResource(mMoodList.get(i).getMoodReferences());
-        mFontLayout.setBackgroundResource(mMoodList.get(i).getColorAssociated());
+        mMoodImage.setImageResource(mMoodsFunc.getCurrentMood(i).getMoodReferences());
+        mFontLayout.setBackgroundResource(mMoodsFunc.getCurrentMood(i).getColorAssociated());
+        mMoodsFunc.playCurrentSound(i);
 
         //get the date of the system
         int currentDay = myDate.get(Calendar.DAY_OF_MONTH);
@@ -354,36 +345,17 @@ public class MainActivity extends AppCompatActivity
      */
     private void addToRecentMoods(int i, int mCurrentDay)
     {
-        mRecentMood.addLast(mMoodList.get(i));
+        mRecentMood.addLast(mMoodsFunc.getCurrentMood(i));
         mRecentMood.getLast().setDay(mCurrentDay);
         Log.i(LOG_TAG_INFO_LISTMOODS, "Successfully added to mRecentMood");
     }
 
-    /**
-     * <b>This method fill the ArrayList with object that represent the different possibilities.</b>
-     * <p>
-     * This method instantiate one object of each mood type and insert it in the ArrayList mMoodList
-     * </p>
-     */
-    private void setMoodList()
-    {
-        Mood VBMood = new VeryBadMood();
-        mMoodList.add(VBMood);
-        Mood BMood = new BadMood();
-        mMoodList.add(BMood);
-        Mood NMood = new NormalMood();
-        mMoodList.add(NMood);
-        Mood HMood = new HappyMood();
-        mMoodList.add(HMood);
-        Mood VHMood = new VeryHappyMood();
-        mMoodList.add(VHMood);
-    }
 
     /**
      * <b>used to set the new mood when a scroll down is detected</b>
      * <p>
      *     The value of mCurrentMood is decreased and the method verify that mCurrentMood isn't out of bound. If it is out of bound
-     *     the method reset mCurrentMood to a correct value, here this is the end of the index of the ArrayList {@link MainActivity#mMoodList} contains all the moods.
+     *     the method reset mCurrentMood to a correct value, here this is the end of the index of the ArrayList {@link MoodsFunctionality#mMoodList} contains all the moods.
      * </p>
      *
      * @see MyGestureListener
@@ -391,14 +363,14 @@ public class MainActivity extends AppCompatActivity
     public void decreaseCurrentModPosition()
     {
         mCurrentMood--;
-        if (mCurrentMood < 0) mCurrentMood = (mMoodList.size()-1);
+        if (mCurrentMood < 0) mCurrentMood = (mMoodsFunc.getListSize()-1);
         setImageAndColor(mCurrentMood);
     }
     /**
      * <b>used to set the new mood when a scroll up is detected</b>
      * <p>
      *     The value of mCurrentMood is increased and the method verify that mCurrentMood isn't out of bound. If it is out of bound
-     *     the method reset mCurrentMood to a correct value, here this is the start of the index of the ArrayList {@link MainActivity#mMoodList} contains all the moods.
+     *     the method reset mCurrentMood to a correct value, here this is the start of the index of the ArrayList {@link MoodsFunctionality#mMoodList} contains all the moods.
      * </p>
      *
      * @see MyGestureListener
@@ -406,7 +378,7 @@ public class MainActivity extends AppCompatActivity
     public void increaseCurrentModPosition()
     {
         mCurrentMood++;
-        if (mCurrentMood >= mMoodList.size()) mCurrentMood = 0;
+        if (mCurrentMood >= mMoodsFunc.getListSize()) mCurrentMood = 0;
         setImageAndColor(mCurrentMood);
     }
 
