@@ -161,7 +161,6 @@ public class RecentMoodAdapter extends RecyclerView.Adapter<RecentMoodAdapter.My
          */
         private Mood mCurrentMood;
 
-
         /**
          * <b>Constructor of MyViewHolder</b>
          * <p>

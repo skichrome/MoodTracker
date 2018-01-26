@@ -40,4 +40,13 @@ public class HappyMood extends Mood
     }
     //GETTERS/SETTERS---------------------------------------------------------------------------
     //METHODS-----------------------------------------------------------------------------------
+    /**
+     * Used for the sharing function of the app
+     *
+     * @return a string who contain the description
+     */
+    public String toString()
+    {
+        return "I am happy today :) " + "\n" + super.toString();
+    }
 }

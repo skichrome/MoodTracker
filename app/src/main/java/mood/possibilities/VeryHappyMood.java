@@ -1,13 +1,13 @@
 package mood.possibilities;
 
 import com.skichrome.moodtracker.R;
+
 /**
  * Specialized class of {@link Mood}, define personalized characteristics
  *
  * @author skichrome
  * @version 1.0
  */
-
 public class VeryHappyMood extends Mood
 {
     //FIELDS------------------------------------------------------------------------------------
@@ -41,4 +41,13 @@ public class VeryHappyMood extends Mood
 
     //GETTERS/SETTERS---------------------------------------------------------------------------
     //METHODS-----------------------------------------------------------------------------------
+    /**
+     * Used for the sharing function of the app
+     *
+     * @return a string who contain the description
+     */
+    public String toString()
+    {
+        return "I am very happy today :D " + "\n" + super.toString();
+    }
 }

@@ -3,7 +3,8 @@
     android:layout_width="wrap_content"
     android:layout_height="100dp"
     android:orientation="horizontal"
-    android:id="@+id/LinearLayout_content_cells">
+    android:id="@+id/LinearLayout_content_cells"
+    android:elevation="8dp">
 
     <TextView
         android:id="@+id/content_cells"

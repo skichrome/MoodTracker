@@ -22,13 +22,6 @@
         android:layout_gravity="bottom"
         android:padding="@dimen/activity_padding">
 
-        <ImageButton
-            android:id="@+id/add_comment"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="start"
-            android:contentDescription="@string/logo_add_comment"
-            android:background="@drawable/ic_note_add_black" />
 
         <ImageButton
             android:id="@+id/recent_mood"
@@ -38,6 +31,23 @@
             android:layout_gravity="end"
             android:contentDescription="@string/logo_check_history"
             android:background="@drawable/ic_history_black" />
+
+        <ImageButton
+            android:id="@+id/share_mood"
+
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:background="?attr/actionModeShareDrawable"
+            android:contentDescription="@string/logo_share_mood" />
+
+        <ImageButton
+            android:id="@+id/add_comment"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="start"
+            android:background="@drawable/ic_note_add_black"
+            android:contentDescription="@string/logo_add_comment" />
 
     </FrameLayout>
 

@@ -1,6 +1,7 @@
 package mood.functionnality;
 
 import android.content.Context;
+import android.content.res.Resources;
 import android.media.AudioManager;
 import android.media.SoundPool;
 
@@ -44,6 +45,7 @@ public class MoodsFunctionality
      * Context, used in SoundPool loading method
      */
     private final Context mCt;
+    private final Resources mResources;
     /**
      * Instance of SoundPool, used to play sound when the user change the mood in the main actiivity
      */
@@ -69,6 +71,7 @@ public class MoodsFunctionality
     public MoodsFunctionality (Context ct)
     {
         this.mCt = ct;
+        this.mResources = mCt.getResources();
         setMoodList();
         setSoundAvailable();
     }
