@@ -17,4 +17,9 @@
     <string name="two_day_ago">Avant-hier</string>
     <string name="yesterday">Hier</string>
     <string name="today">Aujourd\'hui</string>
+
+    <string name="logo_share_mood">Partagez votre humeur !</string>
+    <string name="share_title">Comment voulez-vous partager votre humeur ?</string>
+    <string name="error_during_sharing">Aucune app installée pouvant partager votre humeur :/</string>
+
 </resources>

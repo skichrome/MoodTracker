@@ -45,6 +45,7 @@ public class RecentMoodActivity extends AppCompatActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_recent_mood);
 
+        //create the list of possible moods and the list of cells title
         getSavedMoods();
         setTitleMoods();
 
@@ -53,8 +54,6 @@ public class RecentMoodActivity extends AppCompatActivity
         mRecentMoodAdapter.setLayoutManager(new LinearLayoutManager(this));
         //Create an adapter who set the content of cells
         mRecentMoodAdapter.setAdapter(new RecentMoodAdapter(mRecentMoods, mTitleMoods, this));
-
-
     }
 
     /**
@@ -69,6 +68,10 @@ public class RecentMoodActivity extends AppCompatActivity
         mRecentMoods.clear();
         mRecentMoods = oic.getRecentMoodList();
     }
+
+    /**
+     * <b>Set the list of possible cells title</b>
+     */
     private void setTitleMoods()
     {
         mTitleMoods.add(R.string.today);
@@ -79,8 +82,6 @@ public class RecentMoodActivity extends AppCompatActivity
         mTitleMoods.add(R.string.five_day_ago);
         mTitleMoods.add(R.string.six_day_ago);
         mTitleMoods.add(R.string.one_week_ago);
-
-
     }
 }
 

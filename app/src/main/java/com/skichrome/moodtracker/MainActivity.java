@@ -1,8 +1,10 @@
 package com.skichrome.moodtracker;
 
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.support.v4.view.GestureDetectorCompat;
 import android.support.v7.app.AlertDialog;
@@ -15,17 +17,13 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.Toast;
 
-import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.LinkedList;
 
-import mood.possibilities.BadMood;
-import mood.possibilities.HappyMood;
+import mood.functionnality.MoodsFunctionality;
 import mood.possibilities.Mood;
-import mood.possibilities.NormalMood;
-import mood.possibilities.VeryBadMood;
-import mood.possibilities.VeryHappyMood;
 import mood.save.ObjectInputClass;
 import mood.save.ObjectOutputClass;
 
@@ -44,10 +42,6 @@ public class MainActivity extends AppCompatActivity
      * Debug tag for the Logs
      */
     private final String LOG_TAG_INFO_LISTMOODS = "addToRecentMoods";
-    /**
-     * This ArrayList is used to store all moods possibilities, and wil be used to change the user interface
-     */
-    private ArrayList<Mood> mMoodList = new ArrayList<>();
     /**
      * <b>Contain the list of the moods of last days</b>
      */
@@ -69,6 +63,10 @@ public class MainActivity extends AppCompatActivity
      */
     private ImageButton mBtnRecent;
     /**
+     * Used to share mood
+     */
+    private ImageButton mBtnShare;
+    /**
      * field used to detect gestures
      */
     private GestureDetectorCompat mGestureDetector;
@@ -84,6 +82,10 @@ public class MainActivity extends AppCompatActivity
      * used to pass the context to another object
      */
     Context mContext;
+    /**
+     * contains the list of available moods and functionality available for different moods
+     */
+    private MoodsFunctionality mMoodsFunc;
 
     /**
      * <b>the method called when we start the app</b>
@@ -114,16 +116,15 @@ public class MainActivity extends AppCompatActivity
         mFontLayout = findViewById(R.id.font_layout);
         mBtnComment = findViewById(R.id.add_comment);
         mBtnRecent = findViewById(R.id.recent_mood);
+        mBtnShare = findViewById(R.id.share_mood);
 
-        //create the Gesture detector
+        //create the Gesture detector to detect a user scroll
         mGestureDetector = new GestureDetectorCompat(this, new MyGestureListener());
 
-        //create the list of objects
-        setMoodList();
+        //create an instance of MoodFunctionality class, who will set up all moods possibilities and play a sound when asked
+        mMoodsFunc = new MoodsFunctionality(this);
 
-        //set the image and the color for the first time, debug for the start of the project, not definitive
-        setImageAndColor(mCurrentMood);
-
+        //define the AlertDialog when the user want to write a comment
         mBtnComment.setOnClickListener(new View.OnClickListener()
         {
             /**
@@ -139,22 +140,18 @@ public class MainActivity extends AppCompatActivity
             @Override
             public void onClick(View v)
             {
+
                 //When we click the button we display an Alertdialog who ask user to enter a string and store it in the mood object
                 final AlertDialog.Builder mComment = new AlertDialog.Builder(v.getContext());
                 LayoutInflater inflater = getLayoutInflater();
 
+                //define an AlertDialog title
                 mComment.setTitle(R.string.comment_alertdialog);
+
                 //inflate and set the alertdialog
                 mComment.setView(inflater.inflate(R.layout.alertdialog_res, null));
 
-                String temp = mRecentMood.getLast().getUserComment();
-                if (temp.equals("")) temp = "Aucun comm sauvegardé !";
-
-
-                mComment.setMessage(temp);
-
-                Log.d("AlertDialogStream", temp);
-
+                //define the positive button of the AlertDialog
                 mComment.setPositiveButton(R.string.AlertDialog_positive_btn, new DialogInterface.OnClickListener()
                 {
                     /**
@@ -172,8 +169,9 @@ public class MainActivity extends AppCompatActivity
                     {
                         EditText mAlertDialogEditText = ((AlertDialog) dialog).findViewById(R.id.TextView_alertdialog);
 
-                        if (mAlertDialogEditText != null)
+                        if (mAlertDialogEditText != null || !(mAlertDialogEditText.toString().equals("")))
                         {
+                            //get the user comment
                             String mUserText = mAlertDialogEditText.getText().toString();
                             //Update in the current object the string associated to the user commentaries
                             mRecentMood.getLast().setUserComment(mUserText);
@@ -186,6 +184,7 @@ public class MainActivity extends AppCompatActivity
                     }
                 });
 
+                //define the negative button of the AlertDialog
                 mComment.setNegativeButton(R.string.cancel_alertdialog, new DialogInterface.OnClickListener()
                 {
                     /**
@@ -205,11 +204,39 @@ public class MainActivity extends AppCompatActivity
                     }
                 });
 
+                //create and show the AlertDialog
                 mComment.create();
                 mComment.show();
             }
         });
 
+        //
+        mBtnShare.setOnClickListener(new View.OnClickListener()
+        {
+            @Override
+            public void onClick (View view)
+            {
+                //create a new intent for share the mood
+                Intent intent = new Intent(Intent.ACTION_SEND);
+                intent.setType("text/plain");
+
+                //
+                String textToSend = mMoodsFunc.getCurrentMood(mCurrentMood).toString();
+                if (!(textToSend.equals("")))
+                    intent.putExtra(Intent.EXTRA_TEXT, textToSend);
+
+                //be sure that the system have an app who can send something
+                PackageManager manager = getPackageManager();
+                ComponentName component = intent.resolveActivity(manager);
+
+                if (component != null)
+                    startActivity(Intent.createChooser(intent, getString(R.string.share_title)));
+                else
+                    Toast.makeText(view.getContext(), R.string.error_during_sharing, Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        //Launch RecentMoodActivity when the user click on this button
         mBtnRecent.setOnClickListener(new View.OnClickListener()
         {
             /**
@@ -241,8 +268,11 @@ public class MainActivity extends AppCompatActivity
     @Override
     protected void onPause()
     {
+        //create an instance of ObjectOutputClass and call the method who save to the file the list of recent moods and the index of current mood
         ObjectOutputClass ooc = new ObjectOutputClass(this);
         ooc.saveToFile(mRecentMood, mCurrentMood);
+
+        Log.d("onPause Method", mRecentMood.toString());
 
         super.onPause();
     }
@@ -265,14 +295,19 @@ public class MainActivity extends AppCompatActivity
     @Override
     protected void onResume()
     {
-       ObjectInputClass oic = new ObjectInputClass(this);
-       oic.LoadFromFile();
-       mRecentMood.clear();
-       mRecentMood = oic.getRecentMoodList();
-       mCurrentMood = oic.getCurrentMood();
+        //create an instance of ObjectInputClass and load the list of recent moods (and before that we clear the list to avoid adding some unwanted moods to the list
+        ObjectInputClass oic = new ObjectInputClass(this);
+        oic.LoadFromFile();
+        mRecentMood.clear();
+        mRecentMood = oic.getRecentMoodList();
+        mCurrentMood = oic.getCurrentMood();
 
-       setImageAndColor(mCurrentMood);
-       super.onResume();
+        //set the correct smiley and color
+        setImageAndColor(mCurrentMood);
+
+        Log.d("onResume Method", mRecentMood.toString());
+
+        super.onResume();
     }
 
     /**
@@ -300,8 +335,11 @@ public class MainActivity extends AppCompatActivity
     private void setImageAndColor(int i)
     {
         //set the background  and the emote
-        mMoodImage.setImageResource(mMoodList.get(i).getMoodReferences());
-        mFontLayout.setBackgroundResource(mMoodList.get(i).getColorAssociated());
+        mMoodImage.setImageResource(mMoodsFunc.getCurrentMood(i).getMoodReferences());
+        mFontLayout.setBackgroundResource(mMoodsFunc.getCurrentMood(i).getColorAssociated());
+
+        //play a sound from the MoodsFunctionality class
+        mMoodsFunc.playCurrentSound(i);
 
         //get the date of the system
         int currentDay = myDate.get(Calendar.DAY_OF_MONTH);
@@ -317,6 +355,7 @@ public class MainActivity extends AppCompatActivity
         //the list isn't full
         if (mRecentMood.size() <= 7)
         {
+            //if the date stored is different we simply add a new mood to the recent mood list
             if (savedDay != currentDay)
             {
                 //add new mood to list
@@ -332,6 +371,7 @@ public class MainActivity extends AppCompatActivity
                 Log.i(LOG_TAG_INFO_LISTMOODS, "List not full, delete last and add new ; "+ mRecentMood.size());
             }
         }
+        //if the list is full we remove the first mood and add a new to the list.
         else
         {
             mRecentMood.removeFirst();
@@ -354,36 +394,16 @@ public class MainActivity extends AppCompatActivity
      */
     private void addToRecentMoods(int i, int mCurrentDay)
     {
-        mRecentMood.addLast(mMoodList.get(i));
+        mRecentMood.addLast(mMoodsFunc.getCurrentMood(i));
         mRecentMood.getLast().setDay(mCurrentDay);
         Log.i(LOG_TAG_INFO_LISTMOODS, "Successfully added to mRecentMood");
-    }
-
-    /**
-     * <b>This method fill the ArrayList with object that represent the different possibilities.</b>
-     * <p>
-     * This method instantiate one object of each mood type and insert it in the ArrayList mMoodList
-     * </p>
-     */
-    private void setMoodList()
-    {
-        Mood VBMood = new VeryBadMood();
-        mMoodList.add(VBMood);
-        Mood BMood = new BadMood();
-        mMoodList.add(BMood);
-        Mood NMood = new NormalMood();
-        mMoodList.add(NMood);
-        Mood HMood = new HappyMood();
-        mMoodList.add(HMood);
-        Mood VHMood = new VeryHappyMood();
-        mMoodList.add(VHMood);
     }
 
     /**
      * <b>used to set the new mood when a scroll down is detected</b>
      * <p>
      *     The value of mCurrentMood is decreased and the method verify that mCurrentMood isn't out of bound. If it is out of bound
-     *     the method reset mCurrentMood to a correct value, here this is the end of the index of the ArrayList {@link MainActivity#mMoodList} contains all the moods.
+     *     the method reset mCurrentMood to a correct value, here this is the end of the index of the ArrayList {@link MoodsFunctionality#mMoodList} contains all the moods.
      * </p>
      *
      * @see MyGestureListener
@@ -391,14 +411,14 @@ public class MainActivity extends AppCompatActivity
     public void decreaseCurrentModPosition()
     {
         mCurrentMood--;
-        if (mCurrentMood < 0) mCurrentMood = (mMoodList.size()-1);
+        if (mCurrentMood < 0) mCurrentMood = (mMoodsFunc.getListSize()-1);
         setImageAndColor(mCurrentMood);
     }
     /**
      * <b>used to set the new mood when a scroll up is detected</b>
      * <p>
      *     The value of mCurrentMood is increased and the method verify that mCurrentMood isn't out of bound. If it is out of bound
-     *     the method reset mCurrentMood to a correct value, here this is the start of the index of the ArrayList {@link MainActivity#mMoodList} contains all the moods.
+     *     the method reset mCurrentMood to a correct value, here this is the start of the index of the ArrayList {@link MoodsFunctionality#mMoodList} contains all the moods.
      * </p>
      *
      * @see MyGestureListener
@@ -406,7 +426,7 @@ public class MainActivity extends AppCompatActivity
     public void increaseCurrentModPosition()
     {
         mCurrentMood++;
-        if (mCurrentMood >= mMoodList.size()) mCurrentMood = 0;
+        if (mCurrentMood >= mMoodsFunc.getListSize()) mCurrentMood = 0;
         setImageAndColor(mCurrentMood);
     }
 
@@ -435,6 +455,7 @@ public class MainActivity extends AppCompatActivity
     private class MyGestureListener extends GestureDetector.SimpleOnGestureListener
     {
         //FIELDS------------------------------------------------------------------------------------
+        private static final String DEBUG_TAG = "USER_SCROLLING";
         //CONSTRUCTORS------------------------------------------------------------------------------
         //GETTERS/SETTERS---------------------------------------------------------------------------
         //METHODS-----------------------------------------------------------------------------------
@@ -477,11 +498,11 @@ public class MainActivity extends AppCompatActivity
             if (e1.getY() < e2.getY())
             {
                 decreaseCurrentModPosition();
-                //Log.d(DEBUG_TAG, "top to bottom, scrolled down");
+                Log.d(DEBUG_TAG, "top to bottom, scrolled down");
             } else if (e1.getY() > e2.getY())
             {
                 increaseCurrentModPosition();
-                //Log.d(DEBUG_TAG, "bottom to top, scrolled up");
+                Log.d(DEBUG_TAG, "bottom to top, scrolled up");
             }
             return super.onFling(e1, e2, velocityX, velocityY);
         }

@@ -78,7 +78,7 @@ public class ObjectOutputClass extends ObjectStreamClass
 
             oos.reset();
 
-            Log.d(ERR_TAG, "Commentaire enregistré :" + mRecMood.getLast().getUserComment());
+            Log.d(ERR_TAG, "Comment saved : " + mRecMood.getLast().getUserComment());
 
             oos.writeObject(mRecMood);
             oos.writeInt(mCurrentMoodIndex);

@@ -1,15 +1,17 @@
 package mood.possibilities;
 
-import com.skichrome.moodtracker.MainActivity;
-
 import java.io.Serializable;
 
 /**
- * <b>Generic class used to create a mood object</b>
+ * <b>class used to create a mood object</b>
  *
  * <p>
- *     This generic class contains a field with the type of mood defined in {@link MainActivity#setMoodList()}.
- *     And a field who will be updated with the user commentary.
+ *     This class contains a field with the type of mood.
+ *     A field who will be updated with the user commentary.
+ *     A field with the date, updated in {@link com.skichrome.moodtracker.MainActivity}
+ * </p>
+ * <p>
+ *     The {@link Mood#toString} is used for the sharing functionality
  * </p>
  *
  * @author skichrome
@@ -17,7 +19,6 @@ import java.io.Serializable;
  */
 public class Mood implements Serializable
 {
-
     //FIELDS----------------------------------------------------------------------------------------
     /**
      * contains the comment added by user
@@ -30,20 +31,19 @@ public class Mood implements Serializable
     /**
      * contains the color associated to the smiley
      */
-    protected int mColorAssociated;
+    int mColorAssociated;
     /**
      * contains the type of mood
      */
-    protected int mMoodReferences;
+    int mMoodReferences;
     /**
      * used to set the dimension of the TextView in the adapter
      *
      * @see com.skichrome.moodtracker.RecentMoodAdapter
      */
-    protected int mDimens;
+    int mDimens;
 
     //CONSTRUCTORS----------------------------------------------------------------------------------
-
     /**
      * <b>Constructor of {@link Mood}</b>
      *
@@ -130,6 +130,10 @@ public class Mood implements Serializable
      */
     public String toString()
     {
-        return "User comment : " + this.userComment + "\n" + "Mood reference " + this.mMoodReferences + "Color Reference " + this.mColorAssociated;
+        if (!(userComment.equals("")))
+        {
+            return "Here a comment of my today mood : " + userComment + ".";
+        }
+        else return "";
     }
 }

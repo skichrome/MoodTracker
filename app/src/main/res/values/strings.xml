@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">Mood Tracker</string>
     <string name="comment_alertdialog">Commentaries</string>
@@ -16,5 +17,9 @@
     <string name="two_day_ago">Two days ago</string>
     <string name="yesterday">Yesterday</string>
     <string name="today">Today</string>
+
+    <string name="logo_share_mood">Share your mood !</string>
+    <string name="share_title">How do you want to share your mood ?</string>
+    <string name="error_during_sharing">No installed app who can send your mood :/</string>
 
 </resources>
