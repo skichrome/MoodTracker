@@ -25,7 +25,7 @@ public abstract class ObjectStreamClass
     /**
      * This field contains the abstract path of the file
      */
-    protected File mFileName;
+    File mFileName;
 
 
     //CONSTRUCTORS----------------------------------------------------------------------------------
@@ -39,11 +39,9 @@ public abstract class ObjectStreamClass
      * @param mCt
      *      contains the context for the file path
      */
-    public ObjectStreamClass(Context mCt)
+    ObjectStreamClass(Context mCt)
     {
         mFileName = new File (mCt.getFilesDir().getAbsolutePath() + File.separatorChar + "savedmoods.md");
-
-        //mFileName = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + File.pathSeparator + "Android" + File.separator + "data" + File.pathSeparator + mCt.getPackageName() + "SavedMoods.oms");
     }
 
     //GETTERS/SETTERS-------------------------------------------------------------------------------

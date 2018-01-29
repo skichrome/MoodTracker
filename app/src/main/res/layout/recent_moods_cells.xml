@@ -2,9 +2,19 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="wrap_content"
     android:layout_height="100dp"
+    xmlns:tools="http://schemas.android.com/tools"
     android:orientation="horizontal"
     android:id="@+id/LinearLayout_content_cells"
-    android:elevation="8dp">
+    android:elevation="8dp"
+    tools:targetApi="21"
+    >
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@drawable/ripple">
+
+
 
     <TextView
         android:id="@+id/content_cells"
@@ -21,5 +31,7 @@
         android:layout_gravity="center"
         android:padding="15dp"
         android:contentDescription="@string/logo_smiley"/>
+
+    </LinearLayout>
 
 </LinearLayout>

@@ -30,7 +30,7 @@
             android:layout_height="wrap_content"
             android:layout_gravity="end"
             android:contentDescription="@string/logo_check_history"
-            android:background="@drawable/ic_history_black" />
+            android:background="@drawable/ripple_historic" />
 
         <ImageButton
             android:id="@+id/share_mood"
@@ -38,7 +38,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
-            android:background="?attr/actionModeShareDrawable"
+            android:background="@drawable/ripple_share"
             android:contentDescription="@string/logo_share_mood" />
 
         <ImageButton
@@ -46,7 +46,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="start"
-            android:background="@drawable/ic_note_add_black"
+            android:background="@drawable/ripple_add_comment"
             android:contentDescription="@string/logo_add_comment" />
 
     </FrameLayout>
