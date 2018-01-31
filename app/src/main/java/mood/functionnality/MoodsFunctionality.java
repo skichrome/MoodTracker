@@ -157,6 +157,6 @@ public class MoodsFunctionality
      */
     public void playCurrentSound(int index)
     {
-        if (stateOfLoading) sp.play(mSoundAvailable.get(index), 1, 1,1, 0, 1);
+        if (stateOfLoading && index < mSoundAvailable.size()) sp.play(mSoundAvailable.get(index), 1, 1,1, 0, 1);
     }
 }
