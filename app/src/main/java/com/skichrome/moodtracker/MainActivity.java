@@ -347,56 +347,28 @@ public class MainActivity extends AppCompatActivity
 
         //get the saved date, if doesn't set it contains -1
         int savedDay;
-        if (mRecentMood.size() == 0)
-            savedDay = -1;
-        else
-            savedDay = mRecentMood.getLast().getDay();
+        if (mRecentMood.size() == 0) savedDay = -1;
+        else savedDay = mRecentMood.getLast().getDay();
 
-        //the list isn't full
-        if (mRecentMood.size() <= 7)
-        {
-            //if the date stored is different we simply add a new mood to the recent mood list
-            if (savedDay != currentDay)
-            {
-                //add new mood to list
-                addToRecentMoods(i, currentDay);
-                Log.i(LOG_TAG_INFO_LISTMOODS, "List not full, add new only ");
-            }
-            //if the date is the same that the saved date we delete the last object and add a new object with the new selected mood
-            else
-            {
-                mRecentMood.removeLast();
-                //add new mood to list
-                addToRecentMoods(i, currentDay);
-                Log.i(LOG_TAG_INFO_LISTMOODS, "List not full, delete last and add new ; "+ mRecentMood.size());
-            }
-        }
-        //if the list is full we remove the first mood and add a new to the list.
-        else
+        //if the list is full (more than 8 moods saved) we delete the oldest saved mood
+        if (mRecentMood.size() > 7)
         {
             mRecentMood.removeFirst();
-            addToRecentMoods(i, currentDay);
-            Log.i(LOG_TAG_INFO_LISTMOODS, "List full, delete first and add new ; " + mRecentMood.size());
-
+            Log.i(LOG_TAG_INFO_LISTMOODS, "List full, delete first mood of recent mood ");
         }
-    }
 
-    /**
-     * Just add a new mood to the LinkedList mRecentMood
-     *
-     * @see MainActivity#mRecentMood
-     * @see MainActivity#setImageAndColor(int)
-     *
-     * @param i
-     *      Integer, used to get the focused mood
-     * @param mCurrentDay
-     *      Integer, contains the current day
-     */
-    private void addToRecentMoods(int i, int mCurrentDay)
-    {
+        //if the date stored is the same we delete the most recent mood
+        if (savedDay == currentDay)
+        {
+            mRecentMood.removeLast();
+            Log.i(LOG_TAG_INFO_LISTMOODS, "List not full, same day, remove the most recent mood ");
+        }
+
+        //Add the displayed mood to the recent mood list
         mRecentMood.addLast(mMoodsFunc.getCurrentMood(i));
-        mRecentMood.getLast().setDay(mCurrentDay);
-        Log.i(LOG_TAG_INFO_LISTMOODS, "Successfully added to mRecentMood");
+        mRecentMood.getLast().setDay(currentDay);
+
+        Log.d(LOG_TAG_INFO_LISTMOODS, "Successfully added to mRecentMood; size of recent mood list : " + mRecentMood.size());
     }
 
     /**

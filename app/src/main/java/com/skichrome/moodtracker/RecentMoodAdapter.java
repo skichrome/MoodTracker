@@ -43,10 +43,6 @@ public class RecentMoodAdapter extends RecyclerView.Adapter<RecentMoodAdapter.My
      * used to display the correct tag to the recent mood
      */
     private int mRecentIndex = 0;
-    /**
-     * used to display the good mood, and save it to be reused in case of the user click to the case, to display comment with toast
-     */
-    private Mood currentMood;
 
     /**
      * <b>Constructor of {@link RecentMoodAdapter}</b>
@@ -63,11 +59,14 @@ public class RecentMoodAdapter extends RecyclerView.Adapter<RecentMoodAdapter.My
      * @param mCt
      *      Context
      */
-    public RecentMoodAdapter(LinkedList<Mood> recentMoods, ArrayList<Integer> mTitle, Context mCt)
+    RecentMoodAdapter(LinkedList<Mood> recentMoods, ArrayList<Integer> mTitle, Context mCt)
     {
         this.mRecMoods = recentMoods;
         this.mTitleMoods = mTitle;
         this.mResources = mCt.getResources();
+
+        //check if the recent mood list is full (8 moods saved) or not, if it is not full we hav to decrease the size of mTitleMoods to bind the correct title to the cell
+        if (mRecMoods.size() != mTitleMoods.size()) mRecentIndex = mTitleMoods.size() - mRecMoods.size();
     }
 
     /**
@@ -134,6 +133,9 @@ public class RecentMoodAdapter extends RecyclerView.Adapter<RecentMoodAdapter.My
     @Override
     public void onBindViewHolder(MyViewHolder holder, int position)
     {
+        //used to display the good mood, and save it to be reused in case of the user click to the case, to display comment with toast
+        Mood currentMood;
+
         currentMood = mRecMoods.get(position);
         holder.display(currentMood);
     }
@@ -171,7 +173,7 @@ public class RecentMoodAdapter extends RecyclerView.Adapter<RecentMoodAdapter.My
          * @param itemView
          *      the view
          */
-        public MyViewHolder(View itemView)
+        MyViewHolder(View itemView)
         {
             super(itemView);
 
@@ -185,9 +187,7 @@ public class RecentMoodAdapter extends RecyclerView.Adapter<RecentMoodAdapter.My
                 public void onClick(View v)
                 {
                     if(!(mCurrentMood.getUserComment().equals("")))
-                    {
                         Toast.makeText(v.getContext(), mCurrentMood.getUserComment(), Toast.LENGTH_SHORT).show();
-                    }
                 }
             });
         }
@@ -201,21 +201,22 @@ public class RecentMoodAdapter extends RecyclerView.Adapter<RecentMoodAdapter.My
         {
             mCurrentMood = mMood;
 
-            //display the commment icon if a comment is stored
+            //clear the cache who contain the id of the drawing resource if no comment saved, avoid displaying the comment icon on future cells
             if (mMood.getUserComment().equals(""))
-            {
-                myImage.setImageResource(0);
-            }
-            //hide the icon if no comment available
+                myImage.destroyDrawingCache();
+
+            //show the icon if a comment is available
             else
-            {
                 myImage.setImageResource(R.drawable.ic_comment_black_48px);
-            }
 
+            //set the color of the cell
             myLinearLayout.setBackgroundResource(mMood.getColorAssociated());
-            myMood.setText(mTitleMoods.get(mRecMoods.size() - ++mRecentIndex));
 
+            //set the title of the cell
+            if (mRecentIndex < mTitleMoods.size())
+                myMood.setText(mTitleMoods.get(mRecentIndex++));
 
+            //set the cell width according to the mood type
             ViewGroup.LayoutParams lParams = myMood.getLayoutParams();
             lParams.width =((int)(mResources.getDimension(mMood.getDimens())/(mResources.getDisplayMetrics().density)));
             myMood.setLayoutParams(lParams);

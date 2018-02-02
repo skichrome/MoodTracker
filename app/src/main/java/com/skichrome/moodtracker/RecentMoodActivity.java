@@ -28,10 +28,6 @@ public class RecentMoodActivity extends AppCompatActivity
      * Used to store the titles of the recent mood TextViews
      */
     private ArrayList<Integer> mTitleMoods = new ArrayList<>();
-    /**
-     * used to pass the context to another object
-     */
-    private Context mContext;
 
     /**
      * <b>Load recent mood list in file and create a RecyclerView</b>
@@ -74,14 +70,14 @@ public class RecentMoodActivity extends AppCompatActivity
      */
     private void setTitleMoods()
     {
-        mTitleMoods.add(R.string.today);
-        mTitleMoods.add(R.string.yesterday);
-        mTitleMoods.add(R.string.two_day_ago);
-        mTitleMoods.add(R.string.three_day_ago);
-        mTitleMoods.add(R.string.four_day_ago);
-        mTitleMoods.add(R.string.five_day_ago);
-        mTitleMoods.add(R.string.six_day_ago);
         mTitleMoods.add(R.string.one_week_ago);
+        mTitleMoods.add(R.string.six_day_ago);
+        mTitleMoods.add(R.string.five_day_ago);
+        mTitleMoods.add(R.string.four_day_ago);
+        mTitleMoods.add(R.string.three_day_ago);
+        mTitleMoods.add(R.string.two_day_ago);
+        mTitleMoods.add(R.string.yesterday);
+        mTitleMoods.add(R.string.today);
     }
 }
 
