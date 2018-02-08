@@ -79,10 +79,6 @@ public class MainActivity extends AppCompatActivity
      */
     Calendar myDate = Calendar.getInstance();
     /**
-     * used to pass the context to another object
-     */
-    Context mContext;
-    /**
      * contains the list of available moods and functionality available for different moods
      */
     private MoodsFunctionality mMoodsFunc;
@@ -351,7 +347,7 @@ public class MainActivity extends AppCompatActivity
         else savedDay = mRecentMood.getLast().getDay();
 
         //if the list is full (more than 8 moods saved) we delete the oldest saved mood
-        if (mRecentMood.size() > 7)
+        while (mRecentMood.size() > 8)
         {
             mRecentMood.removeFirst();
             Log.i(LOG_TAG_INFO_LISTMOODS, "List full, delete first mood of recent mood ");

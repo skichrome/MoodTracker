@@ -119,6 +119,8 @@ public class ObjectInputClass extends ObjectStreamClass
             mRecentMoodList = ((LinkedList<Mood>) ois.readObject());
             currentMood = ois.readInt();
 
+            Log.d(ERR_TAG, mRecentMoodList.toString());
+
         }
         catch (FileNotFoundException e)
         {
@@ -152,6 +154,7 @@ public class ObjectInputClass extends ObjectStreamClass
             {
                 Log.e(ERR_TAG, "not able to close the stream");
             }
+            Log.d(ERR_TAG, "Méthode arrivée au bout");
         }
     }
 }
