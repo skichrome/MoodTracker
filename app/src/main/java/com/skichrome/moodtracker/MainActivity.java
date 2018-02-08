@@ -82,6 +82,10 @@ public class MainActivity extends AppCompatActivity
      * contains the list of available moods and functionality available for different moods
      */
     private MoodsFunctionality mMoodsFunc;
+    /**
+     * Boolean used to avoid override of comment saved in last recent mood after calling onResume method
+     */
+    private boolean stateOfOnResume = false;
 
     /**
      * <b>the method called when we start the app</b>
@@ -217,7 +221,7 @@ public class MainActivity extends AppCompatActivity
                 intent.setType("text/plain");
 
                 //
-                String textToSend = mMoodsFunc.getCurrentMood(mCurrentMood).toString();
+                String textToSend = mRecentMood.getLast().toString();
                 if (!(textToSend.equals("")))
                     intent.putExtra(Intent.EXTRA_TEXT, textToSend);
 
@@ -291,11 +295,18 @@ public class MainActivity extends AppCompatActivity
     @Override
     protected void onResume()
     {
+        //when the onResume method is called, change the value to true
+        stateOfOnResume = true;
+
         //create an instance of ObjectInputClass and load the list of recent moods (and before that we clear the list to avoid adding some unwanted moods to the list
         ObjectInputClass oic = new ObjectInputClass(this);
         oic.LoadFromFile();
         mRecentMood.clear();
         mRecentMood = oic.getRecentMoodList();
+
+        Log.d("Com in Last Mood Saved", mRecentMood.getLast().getUserComment());
+
+        //get the index of current mood
         mCurrentMood = oic.getCurrentMood();
 
         //set the correct smiley and color
@@ -330,6 +341,12 @@ public class MainActivity extends AppCompatActivity
      */
     private void setImageAndColor(int i)
     {
+        //Used to save the comment in the last recent mood saved (avoid a bug of destroying the comment in last recent mood saved, when the date is the same)
+        String tempLastComment;
+        tempLastComment = mRecentMood.getLast().getUserComment();
+
+        Log.d("SET_IMG_COL-mRecentMood", tempLastComment);
+
         //set the background  and the emote
         mMoodImage.setImageResource(mMoodsFunc.getCurrentMood(i).getMoodReferences());
         mFontLayout.setBackgroundResource(mMoodsFunc.getCurrentMood(i).getColorAssociated());
@@ -363,6 +380,13 @@ public class MainActivity extends AppCompatActivity
         //Add the displayed mood to the recent mood list
         mRecentMood.addLast(mMoodsFunc.getCurrentMood(i));
         mRecentMood.getLast().setDay(currentDay);
+
+        //when the method is called in onResume method we have to reset the comment with the good String, and reset the value of stateOfOnResume to false
+        if (stateOfOnResume)
+        {
+            mRecentMood.getLast().setUserComment(tempLastComment);
+            stateOfOnResume = false;
+        }
 
         Log.d(LOG_TAG_INFO_LISTMOODS, "Successfully added to mRecentMood; size of recent mood list : " + mRecentMood.size());
     }
