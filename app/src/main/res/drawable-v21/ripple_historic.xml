@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<ripple
+    tools:targetApi="21"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:color="@color/grey_ripple"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <item android:drawable="@drawable/ic_history_black"/>
+
+</ripple>

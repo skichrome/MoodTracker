@@ -304,7 +304,8 @@ public class MainActivity extends AppCompatActivity
         mRecentMood.clear();
         mRecentMood = oic.getRecentMoodList();
 
-        Log.d("Com in Last Mood Saved", mRecentMood.getLast().getUserComment());
+        if (mRecentMood.size() != 0)
+            Log.d("Com in Last Mood Saved", mRecentMood.getLast().getUserComment());
 
         //get the index of current mood
         mCurrentMood = oic.getCurrentMood();
@@ -342,10 +343,13 @@ public class MainActivity extends AppCompatActivity
     private void setImageAndColor(int i)
     {
         //Used to save the comment in the last recent mood saved (avoid a bug of destroying the comment in last recent mood saved, when the date is the same)
-        String tempLastComment;
-        tempLastComment = mRecentMood.getLast().getUserComment();
+        String tempLastComment = null;
 
-        Log.d("SET_IMG_COL-mRecentMood", tempLastComment);
+        if (mRecentMood.size() != 0)
+        {
+            tempLastComment = mRecentMood.getLast().getUserComment();
+            Log.d("SET_IMG_COL-mRecentMood", tempLastComment);
+        }
 
         //set the background  and the emote
         mMoodImage.setImageResource(mMoodsFunc.getCurrentMood(i).getMoodReferences());
@@ -374,6 +378,7 @@ public class MainActivity extends AppCompatActivity
         if (savedDay == currentDay)
         {
             mRecentMood.removeLast();
+
             Log.i(LOG_TAG_INFO_LISTMOODS, "List not full, same day, remove the most recent mood ");
         }
 
@@ -382,7 +387,7 @@ public class MainActivity extends AppCompatActivity
         mRecentMood.getLast().setDay(currentDay);
 
         //when the method is called in onResume method we have to reset the comment with the good String, and reset the value of stateOfOnResume to false
-        if (stateOfOnResume)
+        if (stateOfOnResume && tempLastComment != null)
         {
             mRecentMood.getLast().setUserComment(tempLastComment);
             stateOfOnResume = false;
